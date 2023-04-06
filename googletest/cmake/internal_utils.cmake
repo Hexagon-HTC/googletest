@@ -72,7 +72,7 @@ macro(config_compiler_and_linker)
   if (MSVC)
     # Newlines inside flags variables break CMake's NMake generator.
     # TODO(vladl@google.com): Add -RTCs and -RTCu to debug builds.
-    set(cxx_base_flags "-GS -W4 -WX -wd4251 -wd4275 -nologo -J")
+    set(cxx_base_flags "-GS -W4 -wd4251 -wd4275 -nologo -J")
     set(cxx_base_flags "${cxx_base_flags} -D_UNICODE -DUNICODE -DWIN32 -D_WIN32")
     set(cxx_base_flags "${cxx_base_flags} -DSTRICT -DWIN32_LEAN_AND_MEAN")
     set(cxx_exception_flags "-EHsc -D_HAS_EXCEPTIONS=1")
@@ -320,13 +320,17 @@ function(install_project)
       LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
     if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
       # Install PDBs
+      set(DESTINATION_DIR ${CMAKE_INSTALL_LIBDIR})
+        if(BUILD_SHARED_LIBS)
+            set(DESTINATION_DIR ${CMAKE_INSTALL_BINDIR})
+        endif()
       foreach(t ${ARGN})
         get_target_property(t_pdb_name ${t} COMPILE_PDB_NAME)
         get_target_property(t_pdb_name_debug ${t} COMPILE_PDB_NAME_DEBUG)
         get_target_property(t_pdb_output_directory ${t} PDB_OUTPUT_DIRECTORY)
         install(FILES
           "${t_pdb_output_directory}/\${CMAKE_INSTALL_CONFIG_NAME}/$<$<CONFIG:Debug>:${t_pdb_name_debug}>$<$<NOT:$<CONFIG:Debug>>:${t_pdb_name}>.pdb"
-          DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          DESTINATION ${DESTINATION_DIR}
           OPTIONAL)
       endforeach()
     endif()
