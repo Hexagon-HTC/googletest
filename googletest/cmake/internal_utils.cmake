@@ -320,13 +320,17 @@ function(install_project)
       LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
     if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
       # Install PDBs
+      set(DESTINATION_DIR ${CMAKE_INSTALL_LIBDIR})
+        if(BUILD_SHARED_LIBS)
+            set(DESTINATION_DIR ${CMAKE_INSTALL_BINDIR})
+        endif()
       foreach(t ${ARGN})
         get_target_property(t_pdb_name ${t} COMPILE_PDB_NAME)
         get_target_property(t_pdb_name_debug ${t} COMPILE_PDB_NAME_DEBUG)
         get_target_property(t_pdb_output_directory ${t} PDB_OUTPUT_DIRECTORY)
         install(FILES
           "${t_pdb_output_directory}/\${CMAKE_INSTALL_CONFIG_NAME}/$<$<CONFIG:Debug>:${t_pdb_name_debug}>$<$<NOT:$<CONFIG:Debug>>:${t_pdb_name}>.pdb"
-          DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          DESTINATION ${DESTINATION_DIR}
           OPTIONAL)
       endforeach()
     endif()
